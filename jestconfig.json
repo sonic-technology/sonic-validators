@@ -1,0 +1,10 @@
+{
+    "transform": {
+        "^.+\\.(t)sx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.index|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
+    "testTimeout": 50000,
+    "roots": ["./__tests__/"],
+    "modulePaths": ["./src"]
+}

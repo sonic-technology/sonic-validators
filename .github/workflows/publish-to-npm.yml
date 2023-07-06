@@ -1,0 +1,80 @@
+name: Publish the package to private npm registry
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    container: node:16
+
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:14
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16.x"
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@sonic-technology'
+      - run: npm install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run tests
+        run: npm run test
+        env:
+          DB_HOST: postgres
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: postgres
+          NODE_ENV: development
+          TEST_EMAIL: sebastian@haede.com
+      - name: Build NPM package
+        run: npm run build
+      - name: Publish NPM package
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get npm version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@main
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ steps.package-version.outputs.current-version }}"
+          name: "v${{ steps.package-version.outputs.current-version }} - ${{ github.event.head_commit.message }}"
+          files: |
+            package.json
+            package-lock.json
+            lib/*
+            - name: Slack Notification
+      - name: Send info to slack
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: backend-modules
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_MESSAGE: "Version ${{ steps.package-version.outputs.current-version }} of backend-modules published to npm"
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}

@@ -1,0 +1,13 @@
+.env
+.env.test
+
+.DS_Store
+node_modules/
+lib/
+npm-debug.log
+
+.idea/
+
+*.rdb
+dump.rdb
+yarn-error.log
