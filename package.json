@@ -1,5 +1,5 @@
 {
-    "name": "@sonic-technology/sonic-validators",
+    "name": "@sonic-inc/sonic-validators",
     "version": "0.0.1",
     "description": "Sonic Validators",
     "main": "lib/index.js",
