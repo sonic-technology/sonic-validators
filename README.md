@@ -1,3 +1,3 @@
 # Sonic Validators
 
-`npm install @sonic-technologies/sonic-validators`
+`npm install @sonic-inc/sonic-validators`
