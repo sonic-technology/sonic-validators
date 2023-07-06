@@ -37,7 +37,7 @@
         "prettier": "^2.8.4",
         "speakeasy": "^2.0.0",
         "typeorm": "^0.3.10",
-        "ua-parser-js": "^1.0.32",
+        "ua-parser-js": "^1.0.35",
         "uuid": "^9.0.0"
     },
     "devDependencies": {
